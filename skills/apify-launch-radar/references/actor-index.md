@@ -6,9 +6,9 @@ specific user intent. All Actors are publicly available on the
 
 | Platform | User intent | Actor ID | Tier | Notes |
 |----------|-------------|----------|------|-------|
-| Product Hunt | Discover today's / this week's / this month's launches, or search a topic | `nexgendata/product-hunt-scraper` | community | Leaderboard mode via `timeframe` (`daily`/`weekly`/`monthly`) + optional `date`; topic mode via `query`; `maxProducts` 1–1000 (default 30); `outputMode` `raw`/`tracker`. Returns name, tagline, votes, url, topics, makers. |
-| Hacker News | Developer reception, Show HN launches, HN full-text search | `harvestlab/hacker-news-scraper` | community | `mode` one of `top`/`search`/`ask`/`show`/`jobs`/`user`; `searchQuery` (search mode); `maxItems` 1–500 (default 30); `minPoints` filter; `includeAiAnalysis` adds ~$0.05/run. ~$0.001/item. Uses official Algolia + Firebase HN APIs (no key). |
-| Reddit | Community discussion + sentiment signal | `trudax/reddit-scraper-lite` | community | `searches` (keywords) **or** `startUrls` (subreddit/post URLs); `searchCommunityName` to scope to one community; `maxItems`, `maxPostCount`, `maxComments`. Pay-per-result. Don't combine `searches` with `startUrls`. |
+| Product Hunt | Discover today's / this week's / this month's launches, or search a topic | `nexgendata/product-hunt-scraper` | community | Leaderboard mode via `timeframe` (`daily`/`weekly`/`monthly`) + optional `date`; topic mode via `query`; `maxProducts` 1–1000 (default 30); `outputMode` `raw`/`tracker`. Returns `name`, `tagline`, `upvoteCount`, `commentCount`, `makerName`, `topics`, `categories`, `websiteUrl`, `launchDate` (verified live). |
+| Hacker News | Developer reception, Show HN launches, HN full-text search | `harvestlab/hacker-news-scraper` | community | `mode` one of `top`/`search`/`ask`/`show`/`jobs`/`user`; `searchQuery` (search mode); `maxItems` 1–500 (default 30); `minPoints` filter; `includeAiAnalysis` adds ~$0.05/run. Returns `title`, `points`, `commentCount`, `url`, `author`, `createdAt`, `hackerNewsUrl` (verified live). Uses official Algolia + Firebase HN APIs (no key). |
+| Reddit | Community discussion + sentiment signal | `trudax/reddit-scraper-lite` | community | `searches` (keywords) **or** `startUrls` (subreddit/post URLs); `searchCommunityName` to scope to one community; `maxItems`, `maxPostCount`, `maxComments`. Pay-per-result. Don't combine `searches` with `startUrls`. **Lite returns** `title`, `communityName`, `url`, `username`, `body`, `createdAt` — text for sentiment but **no numeric vote/comment counts** (verified live); use the full `trudax/reddit-scraper` below for `upVotes`/`numberOfComments`. |
 
 ## Alternates (if a primary Actor is unavailable or rate-limited)
 
@@ -17,6 +17,7 @@ specific user intent. All Actors are publicly available on the
 | Product Hunt | `diverse_venture/producthunt-scraper` | `today`/`date` scrape modes + leaderboards |
 | Product Hunt | `kawsar/product-hunt-scraper` | Simpler search-term scraper |
 | Hacker News | `junipr/hacker-news-scraper` | Firebase + Algolia, full comment threading |
+| Reddit | `trudax/reddit-scraper` | Full version — returns `upVotes`, `numberOfComments`, score; use when the traction score needs Reddit numeric engagement |
 
 ## How to extend
 

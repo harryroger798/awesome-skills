@@ -67,7 +67,7 @@ apify actors call "nexgendata/product-hunt-scraper" \
   2>/dev/null
 ```
 
-For Tracking mode, swap the input for `{"query":"<product or brand>","maxProducts":50,"outputMode":"raw"}`. Keep the `name`, `tagline`, `votesCount`, `url`, `topics`, and maker fields from each item — `name` is the join key for Steps 4–6.
+For Tracking mode, swap the input for `{"query":"<product or brand>","maxProducts":50,"outputMode":"raw"}`. Each item returns `name`, `tagline`, `upvoteCount`, `commentCount`, `makerName`, `topics`, `categories`, `websiteUrl`, and `launchDate` — keep these; `name` is the join key for Steps 4–6.
 
 ### Step 4: Run Hacker News — match developer reception
 
@@ -93,7 +93,7 @@ apify actors call "harvestlab/hacker-news-scraper" \
   2>/dev/null
 ```
 
-Keep `title`, `points`, `num_comments`, `url`, and the HN discussion link per story. Set `includeAiAnalysis` only if the user wants an LLM theme digest — it adds cost (see gotchas).
+Each item returns `title`, `points`, `commentCount`, `url`, `author`, `createdAt`, and `hackerNewsUrl` (the discussion link) — keep these. Set `includeAiAnalysis` only if the user wants an LLM theme digest — it adds cost (see gotchas).
 
 ### Step 5: Run Reddit — community discussion + sentiment
 
@@ -109,7 +109,7 @@ apify actors call "trudax/reddit-scraper-lite" \
   2>/dev/null
 ```
 
-To scope to a specific community (e.g. r/SaaS, r/programming), pass `searchCommunityName` instead of relying on global search. Keep `title`, `communityName`, `upVotes`, `numberOfComments`, `url`, and `body`/snippet per post.
+To scope to a specific community (e.g. r/SaaS, r/programming), pass `searchCommunityName` instead of relying on global search. The **lite** Actor returns `title`, `communityName`, `url`, `username`, `body`, and `createdAt` per post — rich text for sentiment, but **no numeric vote/comment counts**. If you need Reddit upvotes/comment counts for the traction score, use the full `trudax/reddit-scraper` (see [references/actor-index.md](references/actor-index.md)).
 
 ### Step 6: Merge per product, score, and render
 
@@ -117,8 +117,8 @@ Pull each dataset (MCP: `get-dataset-items` with the `datasetId`; CLI: the run a
 
 1. **Join** HN and Reddit results to each Product Hunt product by case-insensitive name match (fall back to fuzzy contains for multi-word names). In Tracking mode there is a single subject row.
 2. **Traction score** per product — a transparent, additive signal (don't overfit):
-   `score = PH_votes + (HN_points × 2) + HN_comments + Reddit_upvotes + (Reddit_comments × 2)`
-   HN points and Reddit comments are weighted up because they reflect engaged developer attention. State the formula in the deliverable so it's auditable.
+   `score = PH_upvotes + PH_comments + (HN_points × 2) + HN_comments + (Reddit_posts × 5)`
+   HN points are weighted up because they reflect engaged developer attention; each matching Reddit post counts as a discussion signal (the lite Actor has no vote counts). If you ran the full `trudax/reddit-scraper`, replace `Reddit_posts × 5` with `Reddit_upvotes + (Reddit_comments × 2)`. State whichever formula you used in the deliverable so it's auditable.
 3. **Sentiment read** — classify each product `positive / mixed / negative / no-signal` from the tone of HN + Reddit titles and top comments. This is a qualitative read, not a model score; quote 1–2 representative lines as evidence. Never invent sentiment for a product with no HN/Reddit hits — label it `no-signal`.
 4. **Render** the ranked digest (default Markdown). One row per product, sorted by traction score.
 
@@ -129,9 +129,9 @@ Digest row schema:
 | Rank | computed |
 | Product | PH `name` (or subject in Tracking mode) |
 | Tagline | PH `tagline` |
-| PH votes | PH `votesCount` |
-| HN points / comments | HN aggregated |
-| Reddit upvotes / comments | Reddit aggregated |
+| PH upvotes / comments | PH `upvoteCount` / `commentCount` |
+| HN points / comments | HN `points` / `commentCount` aggregated |
+| Reddit posts (or upvotes/comments) | Reddit lite: matching post count; full scraper: `upVotes` / `numberOfComments` |
 | Traction score | computed (formula above) |
 | Sentiment | positive / mixed / negative / no-signal |
 | Evidence | 1–2 quoted lines + source links (PH, HN, Reddit) |
