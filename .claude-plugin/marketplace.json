@@ -185,6 +185,29 @@
       ],
       "category": "data-extraction",
       "version": "1.0.0"
+    },
+    {
+      "name": "apify-launch-radar",
+      "source": "./skills/apify-launch-radar",
+      "skills": "./",
+      "description": "Cross-platform launch radar that chains Apify Actors across Product Hunt, Hacker News, and Reddit to track new product/tool launches and how the developer community reacts, merged into one ranked digest with traction (upvotes, points, comments), a sentiment read, and source links. Use to monitor product launches, watch Show HN / a topic, see Reddit reception of a product or competitor, find trending dev/AI tools, or build a daily/weekly launch digest.",
+      "keywords": [
+        "launch-monitoring",
+        "product-hunt",
+        "hacker-news",
+        "show-hn",
+        "reddit",
+        "sentiment",
+        "competitor",
+        "trending",
+        "dev-tools",
+        "ai-tools",
+        "digest",
+        "buzz",
+        "traction"
+      ],
+      "category": "data-extraction",
+      "version": "1.0.0"
     }
   ]
 }
